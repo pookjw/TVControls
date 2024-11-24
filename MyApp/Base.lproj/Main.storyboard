@@ -36,6 +36,7 @@
                                         <color key="value" systemColor="systemPinkColor"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="boolean" keyPath="continuous" value="NO"/>
+                                    <userDefinedRuntimeAttribute type="boolean" keyPath="enabled" value="YES"/>
                                 </userDefinedRuntimeAttributes>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="45a-Yg-p2Y">
