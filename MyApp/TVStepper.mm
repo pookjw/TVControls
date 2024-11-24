@@ -82,7 +82,9 @@
 }
 
 - (void)setWraps:(BOOL)wraps {
+    [self willChangeValueForKey:@"wraps"];
     _wraps = wraps;
+    [self didChangeValueForKey:@"wraps"];
     [self _updateButtonsEnabled];
 }
 
@@ -92,7 +94,9 @@
     
     value = MAX(minimumValue, MIN(maximumValue, value));
     
+    [self willChangeValueForKey:@"value"];
     _value = value;
+    [self didChangeValueForKey:@"value"];
     
     [self _updateButtonsEnabled];
 }
@@ -101,7 +105,9 @@
     double maximumValue = self.maximumValue;
     assert(minimumValue < maximumValue);
     
+    [self willChangeValueForKey:@"minimumValue"];
     _minimumValue = minimumValue;
+    [self didChangeValueForKey:@"minimumValue"];
     
     double value = self.value;
     if (value < minimumValue) {
@@ -113,7 +119,10 @@
     double minimumValue = self.minimumValue;
     assert(minimumValue < maximumValue);
     
+    [self willChangeValueForKey:@"maximumValue"];
     _maximumValue = maximumValue;
+    [self didChangeValueForKey:@"maximumValue"];
+    
     double value = self.value;
     if (maximumValue < value) {
         self.value = maximumValue;

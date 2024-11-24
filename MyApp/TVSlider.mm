@@ -276,17 +276,23 @@
 }
 
 - (void)setMinimumValue:(float)minimumValue {
+    [self willChangeValueForKey:@"minimumValue"];
     _minimumValue = minimumValue;
+    [self didChangeValueForKey:@"minimumValue"];
     [self setNeedsUpdateConstraints];
 }
 
 - (void)setMaximumValue:(float)maximumValue {
+    [self willChangeValueForKey:@"maximumValue"];
     _maximumValue = maximumValue;
+    [self didChangeValueForKey:@"maximumValue"];
     [self setNeedsUpdateConstraints];
 }
 
 - (void)setValue:(float)value animated:(BOOL)animated {
+    [self willChangeValueForKey:@"value"];
     _value = value;
+    [self didChangeValueForKey:@"value"];
     
     if (animated) {
         [UIView animateWithDuration:0.2 animations:^{
