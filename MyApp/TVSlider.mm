@@ -167,6 +167,14 @@
     }
 }
 
+- (BOOL)isEnabled {
+    abort();
+}
+
+- (void)setEnabled:(BOOL)enabled {
+    abort();
+}
+
 - (BOOL)isEditing {
     return self._panGestureRecognizer.isEnabled;
 }

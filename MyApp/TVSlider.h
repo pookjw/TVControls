@@ -17,6 +17,7 @@ IB_DESIGNABLE
 @property (nonatomic) IBInspectable float maximumValue;
 @property (nonatomic) IBInspectable float stepValue;
 
+@property (nonatomic, getter=isEnabled) BOOL enabled;
 @property (nonatomic, getter=isContinuous) IBInspectable BOOL continuous;
 @property (nonatomic, getter=isEditing) BOOL editing;
 
