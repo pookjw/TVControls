@@ -5,6 +5,10 @@
 //  Created by Jinwoo Kim on 11/21/24.
 //
 
+#import <TargetConditionals.h>
+
+#if TARGET_OS_TV
+
 #import "TVSlider.h"
 #import <objc/message.h>
 #import <objc/runtime.h>
@@ -617,3 +621,5 @@
 }
 
 @end
+
+#endif

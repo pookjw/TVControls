@@ -9,6 +9,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+API_AVAILABLE(tvos(18.0))
 IB_DESIGNABLE
 @interface TVStepper : UIView
 @property (nonatomic,getter=isContinuous) IBInspectable BOOL continuous;
