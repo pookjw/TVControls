@@ -156,7 +156,7 @@ void swizzle() {
     
     if (floatingContentView) return floatingContentView;
     
-    floatingContentView = ((id (*)(id, SEL, CGRect))objc_msgSend)([objc_lookUpClass("_UIFloatingContentView") alloc], @selector(initWithFrame:), self.bounds);
+    floatingContentView = reinterpret_cast<id (*)(id, SEL, CGRect)>(objc_msgSend)([objc_lookUpClass("_UIFloatingContentView") alloc], @selector(initWithFrame:), self.bounds);
     
     reinterpret_cast<void (*)(id, SEL, CGPoint)>(objc_msgSend)(floatingContentView, sel_registerName("setFocusScaleAnchorPoint:"), CGPointMake(0.5, 1.));
     

@@ -336,7 +336,7 @@
 - (__kindof UIView *)_floatingContentView {
     if (auto floatingContentView = __floatingContentView) return floatingContentView;
     
-    __kindof UIView *floatingContentView = ((id (*)(id, SEL, CGRect))objc_msgSend)([objc_lookUpClass("_UIFloatingContentView") alloc], @selector(initWithFrame:), self.bounds);
+    __kindof UIView *floatingContentView = reinterpret_cast<id (*)(id, SEL, CGRect)>(objc_msgSend)([objc_lookUpClass("_UIFloatingContentView") alloc], @selector(initWithFrame:), self.bounds);
     
     reinterpret_cast<void (*)(id, SEL, CGPoint)>(objc_msgSend)(floatingContentView, sel_registerName("setFocusScaleAnchorPoint:"), CGPointMake(0.5, 1.));
     
