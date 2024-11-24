@@ -153,9 +153,8 @@
     
     if ([context.nextFocusedView isEqual:self]) {
         if (self.isEditing) {
-            ((void (*)(id, SEL, NSUInteger, BOOL))objc_msgSend)(self._floatingContentView, sel_registerName("setControlState:animated:"), 4, YES);
-        } else {
-            ((void (*)(id, SEL, NSUInteger, BOOL))objc_msgSend)(self._floatingContentView, sel_registerName("setControlState:animated:"), 8, YES);
+            reinterpret_cast<void (*)(id, SEL, NSUInteger, BOOL)>(objc_msgSend)(self._floatingContentView, sel_registerName("setControlState:animated:"), 4, YES);
+        } else { reinterpret_cast<void (*)(id, SEL, NSUInteger, BOOL)>(objc_msgSend)(self._floatingContentView, sel_registerName("setControlState:animated:"), 8, YES);
         }
     } else {
         [self._pressTimer invalidate];
@@ -176,12 +175,12 @@
     self._panGestureRecognizer.enabled = editing;
     
     if (editing and self.isFocused) {
-        ((void (*)(id, SEL, NSUInteger, BOOL))objc_msgSend)(self._floatingContentView, sel_registerName("setControlState:animated:"), 4, YES);
+        reinterpret_cast<void (*)(id, SEL, NSUInteger, BOOL)>(objc_msgSend)(self._floatingContentView, sel_registerName("setControlState:animated:"), 4, YES);
     } else {
         if (self.isFocused) {
-            ((void (*)(id, SEL, NSUInteger, BOOL))objc_msgSend)(self._floatingContentView, sel_registerName("setControlState:animated:"), 8, YES);
+            reinterpret_cast<void (*)(id, SEL, NSUInteger, BOOL)>(objc_msgSend)(self._floatingContentView, sel_registerName("setControlState:animated:"), 8, YES);
         } else {
-            ((void (*)(id, SEL, NSUInteger, BOOL))objc_msgSend)(self._floatingContentView, sel_registerName("setControlState:animated:"), 0, YES);
+            reinterpret_cast<void (*)(id, SEL, NSUInteger, BOOL)>(objc_msgSend)(self._floatingContentView, sel_registerName("setControlState:animated:"), 0, YES);
         }
     }
     
@@ -339,7 +338,7 @@
     
     __kindof UIView *floatingContentView = ((id (*)(id, SEL, CGRect))objc_msgSend)([objc_lookUpClass("_UIFloatingContentView") alloc], @selector(initWithFrame:), self.bounds);
     
-    ((void (*)(id, SEL, CGPoint))objc_msgSend)(floatingContentView, sel_registerName("setFocusScaleAnchorPoint:"), CGPointMake(0.5f, 1.f));
+    reinterpret_cast<void (*)(id, SEL, CGPoint)>(objc_msgSend)(floatingContentView, sel_registerName("setFocusScaleAnchorPoint:"), CGPointMake(0.5, 1.));
     
     __floatingContentView = [floatingContentView retain];
     return [floatingContentView autorelease];

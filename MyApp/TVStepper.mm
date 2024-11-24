@@ -72,27 +72,18 @@
     
     __actions = [NSMutableArray new];
     
-    self.continuous = YES;
-    self.autorepeat = YES;
-    self.wraps = NO;
+    _continuous = YES;
+    _autorepeat = YES;
+    _wraps = NO;
+    _minimumValue = 0.;
+    _maximumValue = 100.;
+    _stepValue = 1.;
     self.value = 0.;
-    self.minimumValue = 0.;
-    self.maximumValue = 100.;
-    self.stepValue = 1.;
 }
 
-- (void)setAutorepeat:(BOOL)autorepeat {
-    _autorepeat = autorepeat;
-    
-    if (autorepeat) {
-        if (self._plusButton.isHighlighted) {
-            [self _startTimerWithIncrement:YES];
-        } else if (self._minusButton.isHighlighted) {
-            [self _startTimerWithIncrement:NO];
-        }
-    } else {
-        [self _invalidateTimer];
-    }
+- (void)setWraps:(BOOL)wraps {
+    _wraps = wraps;
+    [self _updateButtonsEnabled];
 }
 
 - (void)setValue:(double)value {
@@ -103,13 +94,7 @@
     
     _value = value;
     
-    if (value == minimumValue) {
-        self._minusButton.enabled = NO;
-        self._plusButton.enabled = YES;
-    } else if (value == maximumValue) {
-        self._minusButton.enabled = YES;
-        self._plusButton.enabled = NO;
-    }
+    [self _updateButtonsEnabled];
 }
 
 - (void)setMinimumValue:(double)minimumValue {
@@ -133,10 +118,6 @@
     if (maximumValue < value) {
         self.value = maximumValue;
     }
-}
-
-- (void)setStepValue:(double)stepValue {
-    _stepValue = stepValue;
 }
 
 - (void)addAction:(UIAction *)action {
@@ -222,10 +203,12 @@
             [self _invalidateTimer];
         }
     } else {
-        // autorepeaat 도중 값이 증감된 상태에서 타이머가 꺼지면 값이 안 커져야함
         if (!isHighlighted) {
             [self _increment];
             [self _sendEvents];
+            
+            // autorepeat가 켜진 상태에서 Highlight가 되고 autorepeast가 꺼지거 Hightlight가 꺼질 때
+            [self _invalidateTimer];
         }
     }
 }
@@ -335,6 +318,24 @@
 - (void)_sendEvents {
     for (UIAction *action in self._actions) {
         [action performWithSender:self target:nil];
+    }
+}
+
+- (void)_updateButtonsEnabled {
+    if (!self.wraps) {
+        if (self.value == self.minimumValue) {
+            self._minusButton.enabled = NO;
+            self._plusButton.enabled = YES;
+        } else if (self.value == self.maximumValue) {
+            self._minusButton.enabled = YES;
+            self._plusButton.enabled = NO;
+        } else {
+            self._minusButton.enabled = YES;
+            self._plusButton.enabled = YES;
+        }
+    } else {
+        self._minusButton.enabled = YES;
+        self._plusButton.enabled = YES;
     }
 }
 
