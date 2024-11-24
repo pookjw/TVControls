@@ -70,6 +70,73 @@
     
     reinterpret_cast<void (*)(id, SEL, id)>(objc_msgSend)(self, sel_registerName("_addBoundsMatchingConstraintsForView:"), stackView);
     
+    __actions = [NSMutableArray new];
+    
+    self.continuous = YES;
+    self.autorepeat = YES;
+    self.wraps = NO;
+    self.value = 0.;
+    self.minimumValue = 0.;
+    self.maximumValue = 100.;
+    self.stepValue = 1.;
+}
+
+- (void)setAutorepeat:(BOOL)autorepeat {
+    _autorepeat = autorepeat;
+    
+    if (autorepeat) {
+        if (self._plusButton.isHighlighted) {
+            [self _startTimerWithIncrement:YES];
+        } else if (self._minusButton.isHighlighted) {
+            [self _startTimerWithIncrement:NO];
+        }
+    } else {
+        [self _invalidateTimer];
+    }
+}
+
+- (void)setValue:(double)value {
+    double minimumValue = self.minimumValue;
+    double maximumValue = self.maximumValue;
+    
+    value = MAX(minimumValue, MIN(maximumValue, value));
+    
+    _value = value;
+    
+    if (value == minimumValue) {
+        self._minusButton.enabled = NO;
+        self._plusButton.enabled = YES;
+    } else if (value == maximumValue) {
+        self._minusButton.enabled = YES;
+        self._plusButton.enabled = NO;
+    }
+}
+
+- (void)setMinimumValue:(double)minimumValue {
+    double maximumValue = self.maximumValue;
+    assert(minimumValue < maximumValue);
+    
+    _minimumValue = minimumValue;
+    
+    double value = self.value;
+    if (value < minimumValue) {
+        self.value = minimumValue;
+    }
+}
+
+- (void)setMaximumValue:(double)maximumValue {
+    double minimumValue = self.minimumValue;
+    assert(minimumValue < maximumValue);
+    
+    _maximumValue = maximumValue;
+    double value = self.value;
+    if (maximumValue < value) {
+        self.value = maximumValue;
+    }
+}
+
+- (void)setStepValue:(double)stepValue {
+    _stepValue = stepValue;
 }
 
 - (void)addAction:(UIAction *)action {
@@ -136,21 +203,56 @@
 }
 
 - (void)_didPlusButtonChangeHighlighted {
+    BOOL isHighlighted = self._plusButton.isHighlighted;
+    
     if (self.autorepeat) {
-        if (self._plusButton.isHighlighted) {
+        if (isHighlighted) {
             [self _startTimerWithIncrement:YES];
         } else {
+            NSNumber *startedValueNumber = self._timer.userInfo[@"startedValue"];
+            assert(startedValueNumber != nil);
+            
+            if (self.value == startedValueNumber.doubleValue) {
+                [self _increment];
+                [self _sendEvents];
+            } else if (!self.continuous) {
+                [self _sendEvents];
+            }
+            
             [self _invalidateTimer];
+        }
+    } else {
+        // autorepeaat 도중 값이 증감된 상태에서 타이머가 꺼지면 값이 안 커져야함
+        if (!isHighlighted) {
+            [self _increment];
+            [self _sendEvents];
         }
     }
 }
 
 - (void)_didMinusButtonChangeHighlighted {
+    BOOL isHighlighted = self._minusButton.isHighlighted;
+    
     if (self.autorepeat) {
-        if (self._minusButton.isHighlighted) {
+        if (isHighlighted) {
             [self _startTimerWithIncrement:NO];
         } else {
+            NSNumber *startedValueNumber = self._timer.userInfo[@"startedValue"];
+            assert(startedValueNumber != nil);
+            
+            if (self.value == startedValueNumber.doubleValue) {
+                [self _decrement];
+                [self _sendEvents];
+            } else if (!self.continuous) {
+                [self _sendEvents];
+            }
+            
             [self _invalidateTimer];
+        }
+    } else {
+        if (!isHighlighted) {
+            [self _decrement];
+            [self _sendEvents];
         }
     }
 }
@@ -162,7 +264,8 @@
                                                       target:self
                                                     selector:@selector(_didTriggerTimer:)
                                                     userInfo:@{
-        @"isIncrement": @(increment)
+        @"isIncrement": @(increment),
+        @"startedValue": @(self.value)
     }
                                                      repeats:YES];
     
@@ -170,8 +273,10 @@
 }
 
 - (void)_invalidateTimer {
-    assert(self._timer != nil);
-    [self._timer invalidate];
+    NSTimer *timer = self._timer;
+    if (timer == nil) return;
+    
+    [timer invalidate];
     self._timer = nil;
 }
 
@@ -185,19 +290,52 @@
     } else {
         [self _decrement];
     }
+    
+    if (self.continuous) {
+        [self _sendEvents];
+    }
 }
 
 - (void)_increment {
     double value = self.value;
     double maximumValue = self.maximumValue;
-    double minimumValue = self.minimumValue;
+    double stepValue = self.stepValue;
     
+    value += stepValue;
     
-    BOOL wraps = self.wraps;
+    if (maximumValue < value) {
+        if (self.wraps) {
+            value = self.minimumValue;
+        } else {
+            value = maximumValue;
+        }
+    }
+    
+    self.value = value;
 }
 
 - (void)_decrement {
+    double value = self.value;
+    double minimumValue = self.minimumValue;
+    double stepValue = self.stepValue;
     
+    value -= stepValue;
+    
+    if (value < minimumValue) {
+        if (self.wraps) {
+            value = self.maximumValue;
+        } else {
+            value = minimumValue;
+        }
+    }
+    
+    self.value = value;
+}
+
+- (void)_sendEvents {
+    for (UIAction *action in self._actions) {
+        [action performWithSender:self target:nil];
+    }
 }
 
 @end

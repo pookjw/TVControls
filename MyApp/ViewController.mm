@@ -28,6 +28,16 @@
     }]];
     
     TVStepper *stepper = [TVStepper new];
+    stepper.minimumValue = 0.;
+    stepper.maximumValue = 10.;
+    stepper.stepValue = 3.;
+    stepper.autorepeat = YES;
+    stepper.continuous = YES;
+    stepper.wraps = NO;
+    
+    [stepper addAction:[UIAction actionWithHandler:^(__kindof UIAction * _Nonnull action) {
+        NSLog(@"%lf", stepper.value);
+    }]];
     [self.view addSubview:stepper];
     stepper.translatesAutoresizingMaskIntoConstraints = NO;
     [NSLayoutConstraint activateConstraints:@[
