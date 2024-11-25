@@ -12,6 +12,7 @@
 #import <objc/message.h>
 #import <objc/runtime.h>
 #import "MyApp-Swift.h"
+#import "TVToolbar.h"
 
 @interface ViewController ()
 @property (retain, nonatomic) IBOutlet TVSwitch *_switch;
@@ -50,6 +51,27 @@
         [stepper.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor]
     ]];
     
+    TVToolbar *toolbar = [TVToolbar new];
+    UIBarButtonItem *barButtonItem_1 = [[UIBarButtonItem alloc] initWithTitle:@"111" style:UIBarButtonItemStylePlain target:self action:@selector(didTriggerBarButtonItem:)];
+    UIBarButtonItem *barButtonItem_2 = [[UIBarButtonItem alloc] initWithTitle:@"222" style:UIBarButtonItemStylePlain target:self action:@selector(didTriggerBarButtonItem:)];
+    toolbar.items = @[
+        [UIBarButtonItem flexibleSpaceItem],
+        barButtonItem_1,
+        barButtonItem_2,
+        [UIBarButtonItem flexibleSpaceItem]
+    ];
+    [barButtonItem_1 release];
+    [barButtonItem_2 release];
+    
+    [self.view addSubview:toolbar];
+    toolbar.translatesAutoresizingMaskIntoConstraints = NO;
+    [NSLayoutConstraint activateConstraints:@[
+        [toolbar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+        [toolbar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+        [toolbar.bottomAnchor constraintEqualToAnchor:stepper.topAnchor]
+    ]];
+    
+    [toolbar release];
     [stepper release];
 }
 
@@ -57,6 +79,10 @@
     __kindof UIViewController *hostingController = MyApp::makeContentHostingController();
     [self presentViewController:hostingController animated:YES completion:nil];
     [hostingController release];
+}
+
+- (void)didTriggerBarButtonItem:(UIBarButtonItem *)sender {
+    NSLog(@"%s", sel_getName(_cmd));
 }
 
 - (void)dealloc {
