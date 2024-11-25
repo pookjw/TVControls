@@ -11,6 +11,7 @@
 #import "TVSwitch.h"
 #import <objc/message.h>
 #import <objc/runtime.h>
+#import "MyApp-Swift.h"
 
 @interface ViewController ()
 @property (retain, nonatomic) IBOutlet TVSwitch *_switch;
@@ -53,10 +54,14 @@
 }
 
 - (IBAction)foooo:(id)sender {
+    __kindof UIViewController *hostingController = MyApp::makeContentHostingController();
+    [self presentViewController:hostingController animated:YES completion:nil];
+    [hostingController release];
 }
 
 - (void)dealloc {
     [_slider release];
     [super dealloc];
 }
+
 @end

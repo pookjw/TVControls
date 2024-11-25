@@ -26,8 +26,11 @@ IB_DESIGNABLE
 @property (retain, nonatomic, nullable) IBInspectable UIColor *thumbTintColor UI_APPEARANCE_SELECTOR;
 
 - (void)setValue:(float)value animated:(BOOL)animated;
-- (void)addAction:(UIAction *)action;
-- (void)removeAction:(UIAction *)action;
+
+@property (nonatomic, readonly) NSArray<UIAction *> *actions;
+
+- (void)addAction:(UIAction *)action NS_SWIFT_NAME(addAction(_:));
+- (void)removeAction:(UIAction *)action NS_SWIFT_NAME(removeAction(_:));
 @end
 
 NS_ASSUME_NONNULL_END

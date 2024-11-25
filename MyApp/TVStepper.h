@@ -21,8 +21,8 @@ IB_DESIGNABLE
 @property (nonatomic) IBInspectable double stepValue;
 @property (nonatomic, getter=isEnabled) IBInspectable BOOL enabled;
 
-- (void)addAction:(UIAction *)action;
-- (void)removeAction:(UIAction *)action;
+- (void)addAction:(UIAction *)action NS_SWIFT_NAME(addAction(_:));
+- (void)removeAction:(UIAction *)action NS_SWIFT_NAME(removeAction(_:));
 @end
 
 NS_ASSUME_NONNULL_END

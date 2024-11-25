@@ -86,8 +86,6 @@
 }
 
 - (void)setEnabled:(BOOL)enabled {
-    [self willChangeValueForKey:@"enabled"];
-    
     _enabled = enabled;
     self._minusButton.enabled = enabled;
     self._plusButton.enabled = enabled;
@@ -96,13 +94,11 @@
         [self _invalidateTimer];
     }
     
-    [self didChangeValueForKey:@"enabled"];
+    [self.superview setNeedsFocusUpdate];
 }
 
 - (void)setWraps:(BOOL)wraps {
-    [self willChangeValueForKey:@"wraps"];
     _wraps = wraps;
-    [self didChangeValueForKey:@"wraps"];
     [self _updateButtonsEnabled];
 }
 
@@ -111,21 +107,13 @@
     double maximumValue = self.maximumValue;
     
     value = MAX(minimumValue, MIN(maximumValue, value));
-    
-    [self willChangeValueForKey:@"value"];
     _value = value;
-    [self didChangeValueForKey:@"value"];
     
     [self _updateButtonsEnabled];
 }
 
 - (void)setMinimumValue:(double)minimumValue {
-    double maximumValue = self.maximumValue;
-    assert(minimumValue < maximumValue);
-    
-    [self willChangeValueForKey:@"minimumValue"];
     _minimumValue = minimumValue;
-    [self didChangeValueForKey:@"minimumValue"];
     
     double value = self.value;
     if (value < minimumValue) {
@@ -134,12 +122,7 @@
 }
 
 - (void)setMaximumValue:(double)maximumValue {
-    double minimumValue = self.minimumValue;
-    assert(minimumValue < maximumValue);
-    
-    [self willChangeValueForKey:@"maximumValue"];
     _maximumValue = maximumValue;
-    [self didChangeValueForKey:@"maximumValue"];
     
     double value = self.value;
     if (maximumValue < value) {
@@ -154,7 +137,7 @@
 
 - (void)removeAction:(UIAction *)action {
     assert([self._actions containsObject:action]);
-    [self._actions addObject:action];
+    [self._actions removeObject:action];
 }
 
 - (UIStackView *)_stackView {
