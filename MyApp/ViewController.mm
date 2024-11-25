@@ -12,7 +12,7 @@
 #import <objc/message.h>
 #import <objc/runtime.h>
 #import "MyApp-Swift.h"
-#import "TVToolbar.h"
+#import "UIToolbar+CP_UIToolbarTVPatch.h"
 
 @interface ViewController ()
 @property (retain, nonatomic) IBOutlet TVSwitch *_switch;
@@ -51,17 +51,26 @@
         [stepper.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor]
     ]];
     
-    TVToolbar *toolbar = [TVToolbar new];
+    __kindof UIView *toolbar = [objc_lookUpClass("UIToolbar") new];
     UIBarButtonItem *barButtonItem_1 = [[UIBarButtonItem alloc] initWithTitle:@"111" style:UIBarButtonItemStylePlain target:self action:@selector(didTriggerBarButtonItem:)];
     UIBarButtonItem *barButtonItem_2 = [[UIBarButtonItem alloc] initWithTitle:@"222" style:UIBarButtonItemStylePlain target:self action:@selector(didTriggerBarButtonItem:)];
-    toolbar.items = @[
+    UIBarButtonItem *barButtonItem_3 = [[UIBarButtonItem alloc] initWithTitle:@"333" menu:[UIMenu menuWithChildren:@[
+        [UIAction actionWithTitle:@"Foo" image:nil identifier:nil handler:^(__kindof UIAction * _Nonnull action) {}]
+    ]]];
+    
+    objc_setAssociatedObject(toolbar, cp_getUIToolbarTVPatchKey(), [NSNull null], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    
+    reinterpret_cast<void (*)(id, SEL, id)>(objc_msgSend)(toolbar, sel_registerName("setItems:"), @[
         [UIBarButtonItem flexibleSpaceItem],
         barButtonItem_1,
         barButtonItem_2,
-        [UIBarButtonItem flexibleSpaceItem]
-    ];
+        [UIBarButtonItem flexibleSpaceItem],
+        barButtonItem_3
+    ]);
+    
     [barButtonItem_1 release];
     [barButtonItem_2 release];
+    [barButtonItem_3 release];
     
     [self.view addSubview:toolbar];
     toolbar.translatesAutoresizingMaskIntoConstraints = NO;
