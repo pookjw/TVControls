@@ -112,10 +112,8 @@ void swizzle() {
 
 }
 
-OBJC_EXPORT id objc_msgSendSuper2(void);
 
 @interface UIView (CP_UIToolbarTVPatch)
-
 @end
 
 @implementation UIView (CP_UIToolbarTVPatch)
