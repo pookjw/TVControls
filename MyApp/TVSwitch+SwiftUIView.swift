@@ -10,6 +10,7 @@ import SwiftUI
 extension TVSwitch {
     struct SwiftUIView: UIViewRepresentable {
         private static let identifier: UIAction.Identifier = .init("TVSwitch.SwiftUIView")
+        
         private let isOn: Binding<Bool>
         
         init(isOn: Binding<Bool>) {
@@ -19,7 +20,6 @@ extension TVSwitch {
         func makeUIView(context: Context) -> TVSwitch {
             let uiView = TVSwitch()
             
-            uiView.onTintColor = UIColor(Color.red)
             uiView.isOn = isOn.wrappedValue
             uiView.isEnabled = context.environment.isEnabled
             

@@ -9,6 +9,8 @@ import SwiftUI
 
 extension TVSlider {
     struct SwiftUIView: UIViewRepresentable {
+        private static let identifier: UIAction.Identifier = .init("TVSwitch.SwiftUIView")
+        
         private let value: Binding<Float>
         private let bounds: ClosedRange<Float>
         private let step: Float.Stride
@@ -73,10 +75,11 @@ extension TVSlider {
             slider.isEnabled = context.environment.isEnabled
             
             for action in slider.actions {
+                guard action.identifier == Self.identifier else { continue }
                 slider.removeAction(action)
             }
             
-            slider.addAction(.init(handler: { [value] action in
+            slider.addAction(.init(identifier: Self.identifier, handler: { [value] action in
                 let slider = action.sender as! TVSlider
                 
                 if value.wrappedValue != slider.value {

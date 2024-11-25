@@ -9,6 +9,8 @@ import SwiftUI
 
 extension TVStepper {
     struct SwiftUIView: UIViewRepresentable {
+        private static let identifier: UIAction.Identifier = .init("TVSwitch.SwiftUIView")
+        
         private let value: Binding<Double>
         private let bounds: ClosedRange<Double>
         private let step: Double.Stride
@@ -54,7 +56,7 @@ extension TVStepper {
             stepper.wraps = wraps
             stepper.isEnabled = context.environment.isEnabled
             
-            stepper.addAction(.init(handler: { [value] action in
+            stepper.addAction(.init(identifier: Self.identifier, handler: { [value] action in
                 let stepper = action.sender as! TVStepper
                 
                 if value.wrappedValue != stepper.value {
@@ -83,6 +85,7 @@ extension TVStepper {
             stepper.isEnabled = context.environment.isEnabled
             
             for action in stepper.actions {
+                guard action.identifier == Self.identifier else { continue }
                 stepper.removeAction(action)
             }
             
