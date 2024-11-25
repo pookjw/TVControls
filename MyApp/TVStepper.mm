@@ -14,6 +14,7 @@
 #import <objc/runtime.h>
 
 @interface TVStepper ()
+@property (nonatomic, getter=isEditing) BOOL editing;
 @property (retain, nonatomic, readonly) UIStackView *_stackView;
 @property (retain, nonatomic, readonly) UIButton *_plusButton;
 @property (retain, nonatomic, readonly) UIButton *_minusButton;
@@ -82,6 +83,7 @@
     _minimumValue = 0.;
     _maximumValue = 100.;
     _stepValue = 1.;
+    _editing = NO;
     self.value = 0.;
 }
 
@@ -130,9 +132,14 @@
     }
 }
 
+- (NSArray<UIAction *> *)actions {
+    return self._actions;
+}
+
 - (void)addAction:(UIAction *)action {
     assert(![self._actions containsObject:action]);
-    [self._actions addObject:action];
+    UIAction *_immutableCopy = reinterpret_cast<id (*)(id, SEL)>(objc_msgSend)(action, sel_registerName("_immutableCopy"));
+    [self._actions addObject:_immutableCopy];
 }
 
 - (void)removeAction:(UIAction *)action {
@@ -263,6 +270,7 @@
                                                      repeats:YES];
     
     self._timer = timer;
+    self.editing = YES;
 }
 
 - (void)_invalidateTimer {
@@ -271,6 +279,7 @@
     
     [timer invalidate];
     self._timer = nil;
+    self.editing = NO;
 }
 
 - (void)_didTriggerTimer:(NSTimer *)sender {

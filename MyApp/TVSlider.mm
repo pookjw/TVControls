@@ -359,7 +359,8 @@
 
 - (void)addAction:(UIAction *)action {
     assert(![self._actions containsObject:action]);
-    [self._actions addObject:action];
+    UIAction *_immutableCopy = reinterpret_cast<id (*)(id, SEL)>(objc_msgSend)(action, sel_registerName("_immutableCopy"));
+    [self._actions addObject:_immutableCopy];
 }
 
 - (void)removeAction:(UIAction *)action {

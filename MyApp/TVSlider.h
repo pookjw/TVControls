@@ -10,6 +10,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 API_AVAILABLE(tvos(18.0))
+NS_SWIFT_UI_ACTOR
 IB_DESIGNABLE
 @interface TVSlider : UIView
 @property (nonatomic) IBInspectable float value;

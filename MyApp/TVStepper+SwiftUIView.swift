@@ -54,21 +54,82 @@ extension TVStepper {
             stepper.wraps = wraps
             stepper.isEnabled = context.environment.isEnabled
             
+            stepper.addAction(.init(handler: { [value] action in
+                let stepper = action.sender as! TVStepper
+                
+                if value.wrappedValue != stepper.value {
+                    value.wrappedValue = stepper.value
+                }
+            }))
             
+            context.coordinator.isEditingObservation?.invalidate()
+            context.coordinator.isEditingObservation = stepper.observe(\.isEditing, options: .new) { [onEditingChanged] stepper, change in
+                MainActor.assumeIsolated {
+                    onEditingChanged(change.newValue ?? stepper.isEditing)
+                }
+            }
             
             return stepper
         }
         
-        func updateUIView(_ uiView: TVStepper, context: Context) {
+        func updateUIView(_ stepper: TVStepper, context: Context) {
+            stepper.minimumValue = bounds.lowerBound
+            stepper.maximumValue = bounds.upperBound
+            stepper.value = value.wrappedValue
+            stepper.stepValue = step
+            stepper.isContinuous = isContinuous
+            stepper.autorepeat = autorepeat
+            stepper.wraps = wraps
+            stepper.isEnabled = context.environment.isEnabled
             
+            for action in stepper.actions {
+                stepper.removeAction(action)
+            }
+            
+            stepper.addAction(.init(handler: { [value] action in
+                let stepper = action.sender as! TVStepper
+                
+                if value.wrappedValue != stepper.value {
+                    value.wrappedValue = stepper.value
+                }
+            }))
+            
+            context.coordinator.isEditingObservation?.invalidate()
+            context.coordinator.isEditingObservation = stepper.observe(\.isEditing, options: .new) { [onEditingChanged] stepper, change in
+                MainActor.assumeIsolated {
+                    onEditingChanged(change.newValue ?? stepper.isEditing)
+                }
+            }
         }
         
         func makeCoordinator() -> Coordinator {
             .init()
         }
         
+        func continuous(_ continuous: Bool) -> Self {
+            var copy = self
+            copy.isContinuous = continuous
+            return copy
+        }
+        
+        func autorepeat(_ autorepeat: Bool) -> Self {
+            var copy = self
+            copy.autorepeat = autorepeat
+            return copy
+        }
+        
+        func wraps(_ wraps: Bool) -> Self {
+            var copy = self
+            copy.wraps = wraps
+            return copy
+        }
+        
         final class Coordinator {
             @MainActor fileprivate var isEditingObservation: NSKeyValueObservation?
+            
+            deinit {
+                isEditingObservation?.invalidate()
+            }
         }
     }
 }

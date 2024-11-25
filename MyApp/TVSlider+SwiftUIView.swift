@@ -104,6 +104,10 @@ extension TVSlider {
         
         final class Coordinator {
             @MainActor fileprivate var isEditingObservation: NSKeyValueObservation?
+            
+            deinit {
+                isEditingObservation?.invalidate()
+            }
         }
     }
 }
