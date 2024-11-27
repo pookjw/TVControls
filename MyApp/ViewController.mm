@@ -59,8 +59,6 @@
     ]]];
     UIBarButtonItem *barButtonItem_4 = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"eraser.fill"] style:UIBarButtonItemStylePlain target:self action:@selector(didTriggerBarButtonItem:)];
     
-    objc_setAssociatedObject(toolbar, cp_getUIToolbarTVPatchKey(), [NSNull null], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    
     reinterpret_cast<void (*)(id, SEL, id)>(objc_msgSend)(toolbar, sel_registerName("setItems:"), @[
         [UIBarButtonItem flexibleSpaceItem],
         barButtonItem_1,
