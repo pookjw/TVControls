@@ -61,7 +61,12 @@ CGSize (*original)(__kindof UIControl *self, SEL _cmd, CGSize size);
 CGSize custom(__kindof UIControl *self, SEL _cmd, CGSize size) {
     CGSize result = original(self, _cmd, size);
     
-    result.width -= 70.;
+    __kindof UIView *_enclosingBar = reinterpret_cast<id (*)(id, SEL)>(objc_msgSend)(self, sel_registerName("_enclosingBar"));
+    
+    if ([_enclosingBar isKindOfClass:objc_lookUpClass("UIToolbar")]) {
+        // -[UIButtonLegacyVisualProvider alignmentRectInsets]에서 주는 값으로 추정
+        result.width -= 70.;
+    }
     
     return result;
 }
@@ -78,6 +83,13 @@ namespace cp_UIButtonBarButtonVisualProviderIOS {
 namespace _configureTextWithOffset_additionalPadding /* Modern */ {
 void (*original)(id self, SEL _cmd, UIOffset offset, UIEdgeInsets additionalPadding);
 void custom(id self, SEL _cmd, UIOffset offset, UIEdgeInsets additionalPadding) {
+    id _appearanceDelegate;
+    assert(object_getInstanceVariable(self, "_appearanceDelegate", reinterpret_cast<void **>(&_appearanceDelegate)));
+    if (![_appearanceDelegate isKindOfClass:objc_lookUpClass("_UIToolbarContentView")]) {
+        original(self, _cmd, offset, additionalPadding);
+        return;
+    }
+    
     original(self, _cmd, UIOffsetZero, UIEdgeInsetsZero);
 }
 void swizzle() {
@@ -90,12 +102,17 @@ void swizzle() {
 namespace _configureImageWithInsets_paddingEdges_additionalPadding /* Modern */ {
 void (*original)(id self, SEL _cmd, UIOffset offset, NSUInteger paddingEdges, UIEdgeInsets additionalPadding);
 void custom(id self, SEL _cmd, UIOffset offset, NSUInteger paddingEdges, UIEdgeInsets additionalPadding) {
-    original(self, _cmd, offset, paddingEdges, additionalPadding);
+    id _appearanceDelegate;
+    assert(object_getInstanceVariable(self, "_appearanceDelegate", reinterpret_cast<void **>(&_appearanceDelegate)));
+    if (![_appearanceDelegate isKindOfClass:objc_lookUpClass("_UIToolbarContentView")]) {
+        original(self, _cmd, offset, paddingEdges, additionalPadding);
+        return;
+    }
     
-//    NSMutableDictionary<NSString *, NSLayoutConstraint *> *_currentConstraints;
-//    assert(object_getInstanceVariable(self, "_currentConstraints", reinterpret_cast<void **>(&_currentConstraints)));
-//    [NSLayoutConstraint deactivateConstraints:_currentConstraints.allValues];
-//    [_currentConstraints removeAllObjects];
+    NSMutableDictionary<NSString *, NSLayoutConstraint *> *_currentConstraints;
+    assert(object_getInstanceVariable(self, "_currentConstraints", reinterpret_cast<void **>(&_currentConstraints)));
+    [NSLayoutConstraint deactivateConstraints:_currentConstraints.allValues];
+    [_currentConstraints removeAllObjects];
     
     __kindof UIControl *button = reinterpret_cast<id (*)(id, SEL)>(objc_msgSend)(self, sel_registerName("button"));
     __kindof UIButton *imageButton = reinterpret_cast<id (*)(id, SEL)>(objc_msgSend)(self, sel_registerName("imageButton"));
