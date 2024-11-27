@@ -71,22 +71,6 @@ void swizzle() {
 }
 }
 
-namespace contextMenuInteraction_configurationForMenuAtLocation {
-UIContextMenuConfiguration * (*original)(__kindof UIButton *self, SEL _cmd, UIContextMenuInteraction *interaction, CGPoint location);
-UIContextMenuConfiguration *custom(__kindof UIButton *self, SEL _cmd, UIContextMenuInteraction *interaction, CGPoint location) {
-    __kindof UIControl *superview = self.superview;
-    return reinterpret_cast<id (*)(id, SEL, id, CGPoint)>(objc_msgSend)(superview, _cmd, interaction, location);
-}
-void swizzle() {
-//    Method method = class_getInstanceMethod(objc_lookUpClass("UINavigationButton"), @selector(contextMenuInteraction:configurationForMenuAtLocation:));
-//    original = reinterpret_cast<decltype(original)>(method_getImplementation(method));
-//    method_setImplementation(method, reinterpret_cast<IMP>(custom));
-    
-    // @40@?0:8@16{CGPoint=dd}24 @@:@{CGPoint=dd}
-    assert(class_addMethod(objc_lookUpClass("UINavigationButton"), @selector(contextMenuInteraction:configurationForMenuAtLocation:), reinterpret_cast<IMP>(custom), "@40@?0:8@16{CGPoint=dd}24"));
-}
-}
-
 }
 
 
@@ -112,12 +96,55 @@ __kindof UIView * custom(UIBarButtonItem *self, SEL _cmd, __kindof UIView *toolb
         }];
         
         [_info addAction:action forControlEvents:UIControlEventPrimaryActionTriggered];
+        _info.menu = self.menu;
+        _info.preferredMenuElementOrder = self.preferredMenuElementOrder;
+        _info.showsMenuAsPrimaryAction = YES;
     }
     
     return result;
 }
 void swizzle() {
     Method mehtod = class_getInstanceMethod(UIBarButtonItem.class, sel_registerName("createViewForToolbar:"));
+    original = reinterpret_cast<decltype(original)>(method_getImplementation(mehtod));
+    method_setImplementation(mehtod, reinterpret_cast<IMP>(custom));
+}
+}
+
+namespace setMenu {
+void (*original)(UIBarButtonItem *self, SEL _cmd, UIMenu *menu);
+void custom(UIBarButtonItem *self, SEL _cmd, UIMenu *menu) {
+    original(self, _cmd, menu);
+    
+    __kindof UIControl *view = reinterpret_cast<id (*)(id, SEL)>(objc_msgSend)(self, sel_registerName("view"));
+    if ([view isKindOfClass:objc_lookUpClass("UIToolbarButton")]) {
+        __kindof UIButton *_info = reinterpret_cast<id (*)(id, SEL)>(objc_msgSend)(view, sel_registerName("_info"));
+        if ([_info isKindOfClass:UIButton.class]) {
+            _info.menu = menu;
+        }
+    }
+}
+void swizzle() {
+    Method mehtod = class_getInstanceMethod(UIBarButtonItem.class, @selector(setMenu:));
+    original = reinterpret_cast<decltype(original)>(method_getImplementation(mehtod));
+    method_setImplementation(mehtod, reinterpret_cast<IMP>(custom));
+}
+}
+
+namespace setPreferredMenuElementOrder {
+void (*original)(UIBarButtonItem *self, SEL _cmd, UIContextMenuConfigurationElementOrder preferredMenuElementOrder);
+void custom(UIBarButtonItem *self, SEL _cmd, UIContextMenuConfigurationElementOrder preferredMenuElementOrder) {
+    original(self, _cmd, preferredMenuElementOrder);
+    
+    __kindof UIControl *view = reinterpret_cast<id (*)(id, SEL)>(objc_msgSend)(self, sel_registerName("view"));
+    if ([view isKindOfClass:objc_lookUpClass("UIToolbarButton")]) {
+        __kindof UIButton *_info = reinterpret_cast<id (*)(id, SEL)>(objc_msgSend)(view, sel_registerName("_info"));
+        if ([_info isKindOfClass:UIButton.class]) {
+            _info.preferredMenuElementOrder = preferredMenuElementOrder;
+        }
+    }
+}
+void swizzle() {
+    Method mehtod = class_getInstanceMethod(UIBarButtonItem.class, @selector(setPreferredMenuElementOrder:));
     original = reinterpret_cast<decltype(original)>(method_getImplementation(mehtod));
     method_setImplementation(mehtod, reinterpret_cast<IMP>(custom));
 }
@@ -134,8 +161,9 @@ void swizzle() {
 + (void)load {
     cp_UIToolbarButton::preferredFocusEnvironments::addImpl();
     cp_UINavigationButton::sizeThatFits::swizzle();
-    cp_UINavigationButton::contextMenuInteraction_configurationForMenuAtLocation::swizzle();
     cp_UIBarButtonItem::createViewForToolbar::swizzle();
+    cp_UIBarButtonItem::setMenu::swizzle();
+    cp_UIBarButtonItem::setPreferredMenuElementOrder::swizzle();
 }
 
 @end
