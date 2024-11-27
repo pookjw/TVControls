@@ -33,23 +33,23 @@
         NSLog(@"%lf", self.slider.value);
     }]];
     
-    TVStepper *stepper = [TVStepper new];
-    stepper.minimumValue = 0.;
-    stepper.maximumValue = 10.;
-    stepper.stepValue = 3.;
-    stepper.autorepeat = YES;
-    stepper.continuous = YES;
-    stepper.wraps = YES;
-    
-    [stepper addAction:[UIAction actionWithHandler:^(__kindof UIAction * _Nonnull action) {
-        NSLog(@"%lf", stepper.value);
-    }]];
-    [self.view addSubview:stepper];
-    stepper.translatesAutoresizingMaskIntoConstraints = NO;
-    [NSLayoutConstraint activateConstraints:@[
-        [stepper.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
-        [stepper.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor]
-    ]];
+//    TVStepper *stepper = [TVStepper new];
+//    stepper.minimumValue = 0.;
+//    stepper.maximumValue = 10.;
+//    stepper.stepValue = 3.;
+//    stepper.autorepeat = YES;
+//    stepper.continuous = YES;
+//    stepper.wraps = YES;
+//    
+//    [stepper addAction:[UIAction actionWithHandler:^(__kindof UIAction * _Nonnull action) {
+//        NSLog(@"%lf", stepper.value);
+//    }]];
+//    [self.view addSubview:stepper];
+//    stepper.translatesAutoresizingMaskIntoConstraints = NO;
+//    [NSLayoutConstraint activateConstraints:@[
+//        [stepper.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
+//        [stepper.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor]
+//    ]];
     
     __kindof UIView *toolbar = [objc_lookUpClass("UIToolbar") new];
     UIBarButtonItem *barButtonItem_1 = [[UIBarButtonItem alloc] initWithTitle:@"111" style:UIBarButtonItemStylePlain target:self action:@selector(didTriggerBarButtonItem:)];
@@ -57,6 +57,7 @@
     UIBarButtonItem *barButtonItem_3 = [[UIBarButtonItem alloc] initWithTitle:@"333" menu:[UIMenu menuWithChildren:@[
         [UIAction actionWithTitle:@"Foo" image:nil identifier:nil handler:^(__kindof UIAction * _Nonnull action) {}]
     ]]];
+    UIBarButtonItem *barButtonItem_4 = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"eraser.fill"] style:UIBarButtonItemStylePlain target:self action:@selector(didTriggerBarButtonItem:)];
     
     objc_setAssociatedObject(toolbar, cp_getUIToolbarTVPatchKey(), [NSNull null], OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     
@@ -65,23 +66,26 @@
         barButtonItem_1,
         barButtonItem_2,
         [UIBarButtonItem flexibleSpaceItem],
-        barButtonItem_3
+        barButtonItem_3,
+        [UIBarButtonItem flexibleSpaceItem],
+        barButtonItem_4
     ]);
     
     [barButtonItem_1 release];
     [barButtonItem_2 release];
     [barButtonItem_3 release];
+    [barButtonItem_4 release];
     
     [self.view addSubview:toolbar];
     toolbar.translatesAutoresizingMaskIntoConstraints = NO;
     [NSLayoutConstraint activateConstraints:@[
         [toolbar.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
         [toolbar.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-        [toolbar.bottomAnchor constraintEqualToAnchor:stepper.topAnchor]
+        [toolbar.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor]
     ]];
     
     [toolbar release];
-    [stepper release];
+//    [stepper release];
 }
 
 - (IBAction)foooo:(id)sender {

@@ -48,7 +48,7 @@ void addImpl() {
 }
 }
 
-namespace UINavigationButton {
+namespace cp_UINavigationButton {
 
 namespace sizeThatFits {
 CGSize (*original)(__kindof UIControl *self, SEL _cmd, CGSize size);
@@ -71,6 +71,22 @@ void swizzle() {
 }
 }
 
+namespace contextMenuInteraction_configurationForMenuAtLocation {
+UIContextMenuConfiguration * (*original)(__kindof UIButton *self, SEL _cmd, UIContextMenuInteraction *interaction, CGPoint location);
+UIContextMenuConfiguration *custom(__kindof UIButton *self, SEL _cmd, UIContextMenuInteraction *interaction, CGPoint location) {
+    __kindof UIControl *superview = self.superview;
+    return reinterpret_cast<id (*)(id, SEL, id, CGPoint)>(objc_msgSend)(superview, _cmd, interaction, location);
+}
+void swizzle() {
+//    Method method = class_getInstanceMethod(objc_lookUpClass("UINavigationButton"), @selector(contextMenuInteraction:configurationForMenuAtLocation:));
+//    original = reinterpret_cast<decltype(original)>(method_getImplementation(method));
+//    method_setImplementation(method, reinterpret_cast<IMP>(custom));
+    
+    // @40@?0:8@16{CGPoint=dd}24 @@:@{CGPoint=dd}
+    assert(class_addMethod(objc_lookUpClass("UINavigationButton"), @selector(contextMenuInteraction:configurationForMenuAtLocation:), reinterpret_cast<IMP>(custom), "@40@?0:8@16{CGPoint=dd}24"));
+}
+}
+
 }
 
 
@@ -79,7 +95,7 @@ namespace cp_UIBarButtonItem {
 namespace createViewForToolbar {
 __kindof UIView * (*original)(UIBarButtonItem *self, SEL _cmd, __kindof UIView *toolbar);
 __kindof UIView * custom(UIBarButtonItem *self, SEL _cmd, __kindof UIView *toolbar) {
-    __kindof UIView *result = original(self, _cmd, toolbar);
+    __kindof UIControl *result = original(self, _cmd, toolbar);
     
     if (objc_getAssociatedObject(toolbar, cp_getUIToolbarTVPatchKey())) {
         __kindof UIButton *_info = reinterpret_cast<id (*)(id, SEL)>(objc_msgSend)(result, sel_registerName("_info"));
@@ -96,9 +112,6 @@ __kindof UIView * custom(UIBarButtonItem *self, SEL _cmd, __kindof UIView *toolb
         }];
         
         [_info addAction:action forControlEvents:UIControlEventPrimaryActionTriggered];
-        _info.menu = self.menu;
-        _info.showsMenuAsPrimaryAction = YES;
-        _info.preferredMenuElementOrder = self.preferredMenuElementOrder;
     }
     
     return result;
@@ -120,7 +133,8 @@ void swizzle() {
 
 + (void)load {
     cp_UIToolbarButton::preferredFocusEnvironments::addImpl();
-    UINavigationButton::sizeThatFits::swizzle();
+    cp_UINavigationButton::sizeThatFits::swizzle();
+    cp_UINavigationButton::contextMenuInteraction_configurationForMenuAtLocation::swizzle();
     cp_UIBarButtonItem::createViewForToolbar::swizzle();
 }
 
