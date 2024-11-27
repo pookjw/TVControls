@@ -109,6 +109,7 @@ void custom(id self, SEL _cmd, UIOffset offset, NSUInteger paddingEdges, UIEdgeI
         return;
     }
     
+    // Text와 달리 Image는 Greater Than으로 Constraint을 설정하기 때문에 기존꺼를 지우고 직접 설정해준다.
     NSMutableDictionary<NSString *, NSLayoutConstraint *> *_currentConstraints;
     assert(object_getInstanceVariable(self, "_currentConstraints", reinterpret_cast<void **>(&_currentConstraints)));
     [NSLayoutConstraint deactivateConstraints:_currentConstraints.allValues];
